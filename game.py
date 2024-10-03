@@ -32,3 +32,14 @@ while running:
                 running = False
         elif event.type == QUIT:
             running = False
+
+    screen.fill((255,255,255))
+    surface = pygame.Surface((50, 50))
+    surface.fill((0,0,0))
+    rect = surface.get_rect()
+    surface_center = (
+        (SCREEN_WIDTH - surface.get_width()) / 2,
+        (SCREEN_HEIGHT - surface.get_height()) / 2
+    )
+    screen.blit(surface, surface_center)
+    pygame.display.flip()
