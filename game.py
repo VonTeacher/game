@@ -10,18 +10,21 @@ from pygame.locals import (
     QUIT
 )
 
-pygame.init()
-
 SCREEN_WIDTH  = 800
 SCREEN_HEIGHT = 600
 
+class Player(pygame.sprite.Sprite):
+    def __init__(self):
+        super(Player, self).__init__()
+        self.surface = pygame.Surface((75, 25))
+        self.surface.fill((255,0,0))
+        self.rect = self.surface.get_rect()
+
+pygame.init()
+
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-### Game Loop
-# 1 Process user input
-# 2 Updated the state of all game objects
-# 3 Update the display and audio output
-# 4 Maintain the speed of the game
+player = Player()
 
 running = True
 
@@ -33,13 +36,8 @@ while running:
         elif event.type == QUIT:
             running = False
 
-    screen.fill((255,255,255))
-    surface = pygame.Surface((50, 50))
-    surface.fill((0,0,0))
-    rect = surface.get_rect()
-    surface_center = (
-        (SCREEN_WIDTH - surface.get_width()) / 2,
-        (SCREEN_HEIGHT - surface.get_height()) / 2
-    )
-    screen.blit(surface, surface_center)
+    screen.fill((0,0,0))
+
+    screen.blit(player.surface, (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
+
     pygame.display.flip()
