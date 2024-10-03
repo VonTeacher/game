@@ -17,3 +17,18 @@ SCREEN_HEIGHT = 600
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
+### Game Loop
+# 1 Process user input
+# 2 Updated the state of all game objects
+# 3 Update the display and audio output
+# 4 Maintain the speed of the game
+
+running = True
+
+while running:
+    for event in pygame.event.get():
+        if event.type == KEYDOWN:
+            if event.key == K_ESCAPE:
+                running = False
+        elif event.type == QUIT:
+            running = False
