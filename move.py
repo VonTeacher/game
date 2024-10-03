@@ -1,5 +1,13 @@
 import pygame
-import pygame.locals
+from pygame.locals import (
+    K_UP,
+    K_DOWN,
+    K_LEFT,
+    K_RIGHT,
+    K_ESCAPE,
+    KEYDOWN,
+    QUIT
+)
 
 SCREEN_WIDTH = 400
 SCREEN_HEIGHT = 300
@@ -9,23 +17,24 @@ class Player(pygame.sprite.Sprite):
     def __init__(self):
         super(Player, self).__init__()
         self.surface = pygame.Surface((STEP_SIZE, STEP_SIZE))
+        # self.surface.fill((100, 255, 0))
         self.rect = self.surface.get_rect()
 
     def draw(self, surface):
         pygame.draw.rect(surface, (0, 255, 0), self.rect)
 
     def update(self, keys):
-        if keys[pygame.locals.K_UP]:
-            self.rect.y -= STEP_SIZE
+        if keys[K_UP]:
+            self.rect.move_ip(0, -STEP_SIZE)
             if self.rect.y < 0: self.rect.y = 0
-        if keys[pygame.locals.K_DOWN]:
-            self.rect.y += STEP_SIZE
+        if keys[K_DOWN]:
+            self.rect.move_ip(0, STEP_SIZE)
             if self.rect.y > SCREEN_HEIGHT - STEP_SIZE: self.rect.y = SCREEN_HEIGHT - STEP_SIZE
-        if keys[pygame.locals.K_LEFT]:
-            self.rect.x -= STEP_SIZE
+        if keys[K_LEFT]:
+            self.rect.move_ip(-STEP_SIZE, 0)
             if self.rect.x <= 0: self.rect.x = 0
-        if keys[pygame.locals.K_RIGHT]:
-            self.rect.x += STEP_SIZE
+        if keys[K_RIGHT]:
+            self.rect.move_ip(STEP_SIZE, 0)
             if self.rect.x > SCREEN_WIDTH - STEP_SIZE: self.rect.x = SCREEN_WIDTH - STEP_SIZE
 
 pygame.init()
@@ -38,10 +47,10 @@ running = True
 
 while running:
     for event in pygame.event.get():
-        if event.type == pygame.locals.KEYDOWN:
-            if event.key == pygame.locals.K_ESCAPE:
+        if event.type == KEYDOWN:
+            if event.key == K_ESCAPE:
                 running = False
-        if event.type == pygame.locals.QUIT:
+        if event.type == QUIT:
             running = False
 
         keys = pygame.key.get_pressed()
@@ -49,7 +58,9 @@ while running:
     player.update(keys)
     screen.fill((0, 0, 0))
     player.draw(screen)
+
     pygame.display.flip()    
+
     clock.tick(16)
 
 pygame.quit()
