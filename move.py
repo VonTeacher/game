@@ -14,8 +14,23 @@ class Player(pygame.sprite.Sprite):
     def draw(self, surface):
         pygame.draw.rect(surface, (0, 255, 0), self.rect)
 
+    def update(self, keys):
+        if keys[pygame.locals.K_UP]:
+            self.rect.y -= STEP_SIZE
+            if self.rect.y < 0: self.rect.y = 0
+        if keys[pygame.locals.K_DOWN]:
+            self.rect.y += STEP_SIZE
+            if self.rect.y > SCREEN_HEIGHT - STEP_SIZE: self.rect.y = SCREEN_HEIGHT - STEP_SIZE
+        if keys[pygame.locals.K_LEFT]:
+            self.rect.x -= STEP_SIZE
+            if self.rect.x <= 0: self.rect.x = 0
+        if keys[pygame.locals.K_RIGHT]:
+            self.rect.x += STEP_SIZE
+            if self.rect.x > SCREEN_WIDTH - STEP_SIZE: self.rect.x = SCREEN_WIDTH - STEP_SIZE
+
 pygame.init()
 
+clock = pygame.time.Clock()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 player = Player()
 
@@ -24,27 +39,17 @@ running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.locals.KEYDOWN:
-            match event.key:
-                case pygame.locals.K_UP:
-                    player.rect.move_ip(0, -STEP_SIZE)
-                    if player.rect.y <= 0:
-                        player.rect.y = 0
-                case pygame.locals.K_DOWN:
-                    player.rect.move_ip(0, STEP_SIZE)
-                    if player.rect.y >= SCREEN_HEIGHT:
-                        player.rect.y = SCREEN_HEIGHT - STEP_SIZE
-                case pygame.locals.K_LEFT:
-                    player.rect.move_ip(-STEP_SIZE, 0)
-                    if player.rect.x <= 0:
-                        player.rect.x = 0
-                case pygame.locals.K_RIGHT:
-                    player.rect.move_ip(STEP_SIZE, 0)
-                    if player.rect.x >= SCREEN_WIDTH:
-                        player.rect.x = SCREEN_WIDTH - STEP_SIZE
-                case pygame.locals.K_ESCAPE: running = False
-        elif event.type == pygame.locals.QUIT:
+            if event.key == pygame.locals.K_ESCAPE:
+                running = False
+        if event.type == pygame.locals.QUIT:
             running = False
 
+        keys = pygame.key.get_pressed()
+
+    player.update(keys)
     screen.fill((0, 0, 0))
     player.draw(screen)
     pygame.display.flip()    
+    clock.tick(16)
+
+pygame.quit()
