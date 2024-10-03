@@ -11,31 +11,34 @@ from pygame.locals import (
 
 SCREEN_WIDTH = 400
 SCREEN_HEIGHT = 300
-STEP_SIZE = 20
+SPRITE_SIZE = 20
+STEP_SIZE = 5
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super(Player, self).__init__()
-        self.surface = pygame.Surface((STEP_SIZE, STEP_SIZE))
+        self.surface = pygame.Surface((SPRITE_SIZE, SPRITE_SIZE))
         # self.surface.fill((100, 255, 0))
         self.rect = self.surface.get_rect()
+        self.size = SPRITE_SIZE
+        self.step = STEP_SIZE
 
     def draw(self, surface):
         pygame.draw.rect(surface, (0, 255, 0), self.rect)
 
     def update(self, keys):
         if keys[K_UP]:
-            self.rect.move_ip(0, -STEP_SIZE)
+            self.rect.move_ip(0, -self.step)
             if self.rect.y < 0: self.rect.y = 0
         if keys[K_DOWN]:
-            self.rect.move_ip(0, STEP_SIZE)
-            if self.rect.y > SCREEN_HEIGHT - STEP_SIZE: self.rect.y = SCREEN_HEIGHT - STEP_SIZE
+            self.rect.move_ip(0, self.step)
+            if self.rect.y > SCREEN_HEIGHT - self.size: self.rect.y = SCREEN_HEIGHT - self.size
         if keys[K_LEFT]:
-            self.rect.move_ip(-STEP_SIZE, 0)
+            self.rect.move_ip(-self.step, 0)
             if self.rect.x <= 0: self.rect.x = 0
         if keys[K_RIGHT]:
-            self.rect.move_ip(STEP_SIZE, 0)
-            if self.rect.x > SCREEN_WIDTH - STEP_SIZE: self.rect.x = SCREEN_WIDTH - STEP_SIZE
+            self.rect.move_ip(self.step, 0)
+            if self.rect.x > SCREEN_WIDTH - self.size: self.rect.x = SCREEN_WIDTH - self.size
 
 pygame.init()
 
@@ -61,6 +64,6 @@ while running:
 
     pygame.display.flip()    
 
-    clock.tick(16)
+    clock.tick(64)
 
 pygame.quit()
