@@ -1,0 +1,110 @@
+import pygame
+from pygame.locals import (
+    K_UP,
+    K_DOWN,
+    K_LEFT,
+    K_RIGHT,
+    K_ESCAPE,
+    K_q,
+    KEYDOWN,
+    QUIT,
+)
+from random import randint, randrange
+
+STEP_SIZE = 10
+SPRITE_SIZE = 40
+
+WIDTH_UNITS = 16
+HEIGHT_UNITS = 10
+
+SCREEN_WIDTH = WIDTH_UNITS * SPRITE_SIZE
+SCREEN_HEIGHT = HEIGHT_UNITS * SPRITE_SIZE
+
+MAX_BLOCK_COUNT = 20
+
+pygame.init()
+
+clock  = pygame.time.Clock()
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+player = pygame.Rect(0, 0, SPRITE_SIZE, SPRITE_SIZE)
+blocks = []
+
+while len(blocks) < MAX_BLOCK_COUNT:
+    block = pygame.Rect(
+        randrange(WIDTH_UNITS) * SPRITE_SIZE,
+        randrange(HEIGHT_UNITS) * SPRITE_SIZE,
+        SPRITE_SIZE,
+        SPRITE_SIZE
+    )
+    if any([(block.top == existing.top and block.left == existing.left) or (block.top == 0 and block.left == 0) for existing in blocks]): continue
+    else: blocks.append(block)
+
+running = True
+
+while running:
+    px = player.left
+    # px1 = player.left + SPRITE_SIZE
+    px1 = player.right
+    py = player.top
+    # py1 = player.top + SPRITE_SIZE
+    py1 = player.bottom
+
+    for event in pygame.event.get():
+        if event.type == KEYDOWN:
+            if event.key == K_ESCAPE or event.key == K_q: running = False # Presse ESCAPE key
+        if event.type == QUIT: running = False # Click X on the window
+
+        keys = pygame.key.get_pressed()
+
+    if keys[K_UP]:    player.top -= STEP_SIZE
+    if keys[K_DOWN]:  player.top += STEP_SIZE
+    if keys[K_LEFT]:  player.left -= STEP_SIZE
+    if keys[K_RIGHT]: player.left += STEP_SIZE
+
+    for b in blocks:
+        bx  = b.left
+        # bx1 = b.left + SPRITE_SIZE
+        bx1 = b.right
+        by  = b.top
+        # by1 = b.top + SPRITE_SIZE
+        by1 = b.bottom
+
+        # pygame/src_c/rect.c
+        # https://github.com/pygame/pygame/blob/79807da84c9bacf8df5a177763e14c924e3b15e2/src_c/rect.c#L356
+        if player.colliderect(b):
+            STEP_SIZE = 0
+            # The < | > check allows the player to pass through the block
+            # on a well-placed diagonal collision.
+            # SOLUTION: should be to change to <= and >=
+
+            # Second bug: if two blockers are next to each other, when the player
+            # slides from one to the other, the player gets stuck on the second
+            # blocks corner
+            if (px < bx1 and px1 > bx) and py == by1: player.top = by1
+            if (px < bx1 and px1 > bx) and py1 == by: player.top = by - SPRITE_SIZE
+            if (py < by1 and py1 > by) and px == bx1: player.left = bx1
+            if (py < by1 and py1 > by) and px1 == bx: player.left = bx - SPRITE_SIZE
+            # blocks.remove(b)
+            # SCORE += 1
+            # Once the last block was removed, I was unable to move the player. Why is it happening?
+        else: STEP_SIZE = 5
+
+        # BUG: if we hit the corners just perfectly so, the collision detection fails and
+        # the player block goes through a red block
+
+    # Keep player on screen
+    if player.top < 0: player.top = 0
+    if player.top > SCREEN_HEIGHT - SPRITE_SIZE: player.top = SCREEN_HEIGHT - SPRITE_SIZE
+    if player.left < 0: player.left = 0
+    if player.left > SCREEN_WIDTH - SPRITE_SIZE: player.left = SCREEN_WIDTH - SPRITE_SIZE
+
+    screen.fill((0, 0, 0))
+
+    pygame.draw.rect(screen, (0, 255, 0), player)
+    for b in blocks: pygame.draw.rect(screen, (255, 0, 0), b)
+
+    pygame.display.flip()
+
+    clock.tick(60) # Multiplies 1/60 * 1000 to determine the delay timer (16.667ms)
+
+pygame.quit()
