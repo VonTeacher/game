@@ -8,6 +8,7 @@ from pygame.locals import (
     K_q,
     KEYDOWN,
     QUIT,
+    RLEACCEL
 )
 from random import randint, randrange
 
@@ -25,15 +26,17 @@ MAX_BLOCK_COUNT = 20
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super(Player, self).__init__()
-        self.surface = pygame.Surface((SPRITE_SIZE, SPRITE_SIZE))
-        self.surface.fill((0, 255, 0))
+        # self.surface = pygame.Surface((SPRITE_SIZE, SPRITE_SIZE))
+        self.surface = pygame.image.load("rock.png").convert()
+        # self.surface.fill((0, 255, 0))
+        self.surface.set_colorkey((255, 255, 255), RLEACCEL)
         self.rect = self.surface.get_rect(left = 0, top = 0)
 
     def update(self, keys):
-        if keys[K_UP]:    playerRect.move_ip(0, -STEP_SIZE)
-        if keys[K_DOWN]:  playerRect.move_ip(0, STEP_SIZE)
-        if keys[K_LEFT]:  playerRect.move_ip(-STEP_SIZE, 0)
-        if keys[K_RIGHT]: playerRect.move_ip(STEP_SIZE, 0)
+        if keys[K_UP]:    self.rect.move_ip(0, -STEP_SIZE)
+        if keys[K_DOWN]:  self.rect.move_ip(0, STEP_SIZE)
+        if keys[K_LEFT]:  self.rect.move_ip(-STEP_SIZE, 0)
+        if keys[K_RIGHT]: self.rect.move_ip(STEP_SIZE, 0)
 
         # Keep player on screen
         if self.rect.top < 0: self.rect.top = 0
@@ -45,17 +48,25 @@ class Block(pygame.sprite.Sprite):
     def __init__(self):
         super(Block, self).__init__()
         self.surface = pygame.Surface((SPRITE_SIZE, SPRITE_SIZE))
-        self.surface.fill((255, 0, 0))
+        self.surface.fill((127, 63, 0))
         self.rect = self.surface.get_rect(
             left = randrange(WIDTH_UNITS) * SPRITE_SIZE,
             top = randrange(HEIGHT_UNITS) * SPRITE_SIZE)
+
+class Background(pygame.sprite.Sprite):
+    def __init__(self):
+        super(Background, self).__init__()
+        self.surface = pygame.image.load("bg_640_400.png").convert()
+        self.rect = self.surface.get_rect()
 
 pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock  = pygame.time.Clock()
 
 player = Player()
-playerRect = player.rect
+background = Background()
+maps = pygame.sprite.Group()
+maps.add(background)
 
 blocks = pygame.sprite.Group()
 while len(blocks) < MAX_BLOCK_COUNT:
@@ -69,16 +80,17 @@ while len(blocks) < MAX_BLOCK_COUNT:
     ): continue
     else: blocks.add(block)
 all_sprites = pygame.sprite.Group()
-all_sprites.add(player)
+all_sprites.add(maps)
 all_sprites.add(blocks)
+all_sprites.add(player)
 
 running = True
 
 while running:
-    px = playerRect.left
-    px1 = playerRect.right
-    py = playerRect.top
-    py1 = playerRect.bottom
+    px = player.rect.left
+    px1 = player.rect.right
+    py = player.rect.top
+    py1 = player.rect.bottom
 
     for event in pygame.event.get():
         if event.type == KEYDOWN:
