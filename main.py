@@ -102,8 +102,15 @@ while running:
     for entity in all_sprites:
         screen.blit(entity.surface, entity.rect)
 
-    if pygame.sprite.spritecollideany(player, blocks):
-        print(f"Player {player.rect.center} collided with block.")
+    # if pygame.sprite.spritecollideany(player, blocks):
+    #     print(f"Player {player.rect.center} collided with block.")
+
+    # Removes a block when a player collides with it
+    # pygame.sprite.spritecollide(player, blocks, True)
+
+    for block in blocks:
+        if pygame.sprite.collide_rect(player, block):
+            block.surface.fill((0, 0, 255))
 
     pygame.display.flip()
 
